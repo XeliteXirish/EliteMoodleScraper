@@ -1,0 +1,15 @@
+{
+  "name": "moodlescraper",
+  "version": "1.0.0",
+  "description": "A modern simple moodle scraper",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "moodle",
+    "scraper"
+  ],
+  "author": "Shaun O'Neill (XeliteXirish)",
+  "license": "ISC"
+}
