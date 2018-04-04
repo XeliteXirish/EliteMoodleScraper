@@ -1,4 +1,4 @@
-const snekfetch = require('snekfetch');
+const axios = require('axios');
 const cheerio = require('cheerio');
 
 class MoodleUser {
@@ -15,21 +15,21 @@ class MoodleUser {
      * @return {Promise<Boolean>}
      */
     async login() {
-        let res = await snekfetch.post(`${this.moodleURL}/login/index.php`, {query: {username: this.username, password: this.password}})
-        this.loggedIn = res.ok;
+        let res = await axios.post(`${this.moodleURL}/login/index.php`, {auth: {username: this.username, password: this.password}})
+        this.loggedIn = res.status >= 200 && res.status < 300;
 
         // We're gona grab the cookie for future requests
         this.cookie = res.headers['set-cookie'][0].split(';')[0];
-        console.log(res.text);
+        console.log(res.data);
     }
 
     async getModules() {
         if (!this.loggedIn) return console.error(`Not logged in yet!`);
 
-        let res = await snekfetch.get(`${this.moodleURL}/user/profile.php`, {headers: {Cookie: this.cookie}});
-        if (!res.ok) return console.error(`Unable to fetch user modules, Error: ${res.statusText}`);
+        let res = await axios.get(`${this.moodleURL}/user/profile.php`, {headers: {Cookie: this.cookie}});
+        if (!(res.status >= 200 && res.status < 300)) return console.error(`Unable to fetch user modules, Error: ${res.statusText}`);
 
-        const $ = cheerio.load(res.text);
+        const $ = cheerio.load(res.data);
         //console.log(res.text)
         console.log($('.node_category').children().length)
     }
