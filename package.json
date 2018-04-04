@@ -2,7 +2,7 @@
   "name": "moodlescraper",
   "version": "1.0.0",
   "description": "A modern simple moodle scraper",
-  "main": "index.js",
+  "main": "./src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -11,5 +11,10 @@
     "scraper"
   ],
   "author": "Shaun O'Neill (XeliteXirish)",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.2",
+    "requestify": "^0.2.5",
+    "snekfetch": "^3.6.4"
+  }
 }
