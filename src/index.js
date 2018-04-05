@@ -2,8 +2,6 @@ const axios = require('axios');
 let request = require('request-promise').defaults({jar: true});
 const cheerio = require('cheerio');
 
-process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
-
 class MoodleUser {
 
     constructor(username = '', password = '', moodleURL = '') {
@@ -29,15 +27,34 @@ class MoodleUser {
         }
     }
 
+    async getUserInfo() {
+        if (!this.loggedIn) return console.error(`Not logged in yet!`);
+        let res = await axios.get(`${this.moodleURL}/user/profile.php`, {headers: {Cookie: this.cookie}});
+        this._statusCheck(res);
+
+        const $ = cheerio.load(res.data);
+        return {
+            'name': $('#usertext').text(),
+            'avatar': $('.userpicture').first().attr('src')
+        }
+    }
+
+    /**
+     * Returns the users course modules
+     * @return {Promise<*>}
+     */
     async getModules() {
         if (!this.loggedIn) return console.error(`Not logged in yet!`);
 
         let res = await axios.get(`${this.moodleURL}/user/profile.php`, {headers: {Cookie: this.cookie}});
-        if (!(res.status >= 200 && res.status < 300)) return console.error(`Unable to fetch user modules, Error: ${res.statusText}`);
+        this._statusCheck(res);
 
         const $ = cheerio.load(res.data);
-        //console.log(res.text)
-        console.log($('.node_category').children().length)
+        return $('.contentnode').children().first().children().last().children().first().children().map((i, elem) => $(elem).text()).get() || [];
+    }
+
+    _statusCheck(res) {
+        if (!(res.status >= 200 && res.status < 300)) return console.error(`Unable to fetch user data, Error: ${res.statusText}`);
     }
 }
 
