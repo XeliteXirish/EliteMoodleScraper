@@ -1,5 +1,8 @@
 const axios = require('axios');
+let request = require('request-promise').defaults({jar: true});
 const cheerio = require('cheerio');
+
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
 
 class MoodleUser {
 
@@ -15,12 +18,15 @@ class MoodleUser {
      * @return {Promise<Boolean>}
      */
     async login() {
-        let res = await axios.post(`${this.moodleURL}/login/index.php`, {auth: {username: this.username, password: this.password}})
-        this.loggedIn = res.status >= 200 && res.status < 300;
+        try {
+            let res = await request.post({url: `${this.moodleURL}/login/index.php`, followAllRedirects: true, form: {username: this.username, password: this.password}, resolveWithFullResponse: true});
+            this.cookie = res.request.headers.cookie;
+            this.loggedIn = true;
+            return this.loggedIn;
 
-        // We're gona grab the cookie for future requests
-        this.cookie = res.headers['set-cookie'][0].split(';')[0];
-        console.log(res.data);
+        }catch (err) {
+            console.error(`Error logging in, Error: ${err}`)
+        }
     }
 
     async getModules() {

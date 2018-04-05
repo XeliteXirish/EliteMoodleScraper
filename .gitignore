@@ -8,3 +8,5 @@ selfbot.sqlite
 /config.json
 src/static/files/*
 .vscode/
+
+/src/testing.js
