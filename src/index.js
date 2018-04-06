@@ -2,8 +2,17 @@ const axios = require('axios');
 let request = require('request-promise').defaults({jar: true});
 const cheerio = require('cheerio');
 
+/**
+ * Moodle user
+ */
 class MoodleUser {
 
+    /**
+     * Create a new moodle user object
+     * @param {String} username - The users moodle username
+     * @param {String} password - The users moodle password
+     * @param {String} moodleURL - The moodle websites address
+     */
     constructor(username = '', password = '', moodleURL = '') {
         this.username = username;
         this.password = password;
@@ -27,30 +36,55 @@ class MoodleUser {
         }
     }
 
-    async getUserInfo() {
+    /**
+     * Fetches the users information and stores it in the cache
+     * @return {Promise<Object>}
+     */
+    async fetchUserInfo() {
         if (!this.loggedIn) return console.error(`Not logged in yet!`);
         let res = await axios.get(`${this.moodleURL}/user/profile.php`, {headers: {Cookie: this.cookie}});
         this._statusCheck(res);
 
         const $ = cheerio.load(res.data);
-        return {
-            'name': $('#usertext').text(),
+        this.userInfo = {
+            'name': $('.usertext').text(),
             'avatar': $('.userpicture').first().attr('src')
-        }
+        };
+
+        return this.userInfo;
     }
 
     /**
-     * Returns the users course modules
-     * @return {Promise<*>}
+     * Fetches the users course modules and stores it in the cache
+     * @return {Promise<Object>}
      */
-    async getModules() {
+    async fetchModules() {
         if (!this.loggedIn) return console.error(`Not logged in yet!`);
 
         let res = await axios.get(`${this.moodleURL}/user/profile.php`, {headers: {Cookie: this.cookie}});
         this._statusCheck(res);
 
         const $ = cheerio.load(res.data);
-        return $('.contentnode').children().first().children().last().children().first().children().map((i, elem) => $(elem).text()).get() || [];
+        this.modules = $('.contentnode').children().first().children().last().children().first().children().map((i, elem) => $(elem).text()).get() || [];
+        return this.modules;
+    }
+
+    /**
+     * Fetches the users module grades and stores it in the cache
+     * @return {Promise<Object>}
+     */
+    async fetchGrades() {
+        if (!this.loggedIn) return console.error(`Not logged in yet!`);
+
+        let res = await axios.get(`${this.moodleURL}/grade/report/overview/index.php`, {headers: {Cookie: this.cookie}});
+        this._statusCheck(res);
+
+        const $ = cheerio.load(res.data);
+        this.grades = $('#overview-grade').children().last().children().not('.emptyrow').map((i, elem) => {
+            return {name: $(elem).children().first().text(), value: $(elem).children().last().text()}
+        }).get();
+
+        return this.grades;
     }
 
     _statusCheck(res) {
