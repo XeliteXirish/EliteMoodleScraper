@@ -21,6 +21,38 @@ class MoodleUser {
     }
 
     /**
+     * Returns the last login time
+     * @return {*}
+     */
+    get lastLogin() {
+        return this.login ? Date.now() - this.login : null;
+    }
+
+    /**
+     * Returns the cached user grades
+     * @return {jQuery|*}
+     */
+    get grades() {
+        return this.moduleGrades;
+    }
+
+    /**
+     * Returns the cached user modules
+     * @return {jQuery|Array|*}
+     */
+    get modules() {
+        return this.userModules;
+    }
+
+    /**
+     * Returns the user info
+     * @return {{name: jQuery, avatar: *|jQuery}|*}
+     */
+    get info() {
+        return this.userInfo
+    }
+
+    /**
      * Will attempt log the account in
      * @return {Promise<Boolean>}
      */
@@ -29,10 +61,13 @@ class MoodleUser {
             let res = await request.post({url: `${this.moodleURL}/login/index.php`, followAllRedirects: true, form: {username: this.username, password: this.password}, resolveWithFullResponse: true});
             this.cookie = res.request.headers.cookie;
             this.loggedIn = true;
+
+            this.login = Date.now();
+
             return this.loggedIn;
 
         }catch (err) {
-            console.error(`Error logging in, Error: ${err}`)
+            console.error(`Error logging in, Error: ${err.stack}`)
         }
     }
 
@@ -41,17 +76,21 @@ class MoodleUser {
      * @return {Promise<Object>}
      */
     async fetchUserInfo() {
-        if (!this.loggedIn) return console.error(`Not logged in yet!`);
-        let res = await axios.get(`${this.moodleURL}/user/profile.php`, {headers: {Cookie: this.cookie}});
-        this._statusCheck(res);
+        try {
+            if (!this.loggedIn) return console.error(`Not logged in yet!`);
+            let res = await axios.get(`${this.moodleURL}/user/profile.php`, {headers: {Cookie: this.cookie}});
+            this._statusCheck(res);
 
-        const $ = cheerio.load(res.data);
-        this.userInfo = {
-            'name': $('.usertext').text(),
-            'avatar': $('.userpicture').first().attr('src')
-        };
+            const $ = cheerio.load(res.data);
+            this.userInfo = {
+                'name': $('.usertext').text(),
+                'avatar': $('.userpicture').first().attr('src')
+            };
 
-        return this.userInfo;
+            return this.userInfo;
+        } catch (err) {
+            console.error(`Error fetching user info, Error: ${err.stack}`);
+        }
     }
 
     /**
@@ -59,14 +98,18 @@ class MoodleUser {
      * @return {Promise<Object>}
      */
     async fetchModules() {
-        if (!this.loggedIn) return console.error(`Not logged in yet!`);
+        try {
+            if (!this.loggedIn) return console.error(`Not logged in yet!`);
 
-        let res = await axios.get(`${this.moodleURL}/user/profile.php`, {headers: {Cookie: this.cookie}});
-        this._statusCheck(res);
+            let res = await axios.get(`${this.moodleURL}/user/profile.php`, {headers: {Cookie: this.cookie}});
+            this._statusCheck(res);
 
-        const $ = cheerio.load(res.data);
-        this.modules = $('.contentnode').children().first().children().last().children().first().children().map((i, elem) => $(elem).text()).get() || [];
-        return this.modules;
+            const $ = cheerio.load(res.data);
+            this.userModules = $('.contentnode').children().first().children().last().children().first().children().map((i, elem) => $(elem).text()).get() || [];
+            return this.userModules;
+        } catch (err) {
+            console.error(`Error fetching user modules, Error: ${err.stack}`);
+        }
     }
 
     /**
@@ -74,17 +117,36 @@ class MoodleUser {
      * @return {Promise<Object>}
      */
     async fetchGrades() {
-        if (!this.loggedIn) return console.error(`Not logged in yet!`);
+        try {
+            if (!this.loggedIn) return console.error(`Not logged in yet!`);
 
-        let res = await axios.get(`${this.moodleURL}/grade/report/overview/index.php`, {headers: {Cookie: this.cookie}});
-        this._statusCheck(res);
+            let res = await axios.get(`${this.moodleURL}/grade/report/overview/index.php`, {headers: {Cookie: this.cookie}});
+            this._statusCheck(res);
 
-        const $ = cheerio.load(res.data);
-        this.grades = $('#overview-grade').children().last().children().not('.emptyrow').map((i, elem) => {
-            return {name: $(elem).children().first().text(), value: $(elem).children().last().text()}
-        }).get();
+            const $ = cheerio.load(res.data);
+            this.moduleGrades = $('#overview-grade').children().last().children().not('.emptyrow').map((i, elem) => {
+                return {name: $(elem).children().first().text(), value: $(elem).children().last().text()}
+            }).get();
 
-        return this.grades;
+            return this.moduleGrades;
+        } catch (err) {
+            console.error(`Error fetching user grades, Error: ${err.stack}`);
+        }
+    }
+
+    async fetchBlogPosts() {
+        try {
+            if (!this.loggedIn) return console.error(`Not logged in yet!`);
+
+            let res = await axios.get(`${this.moodleURL}/blog/index.php`, {headers: {Cookie: this.cookie}});
+            this._statusCheck(res);
+
+            const $ = cheerio.load(res.data);
+
+
+        } catch (err) {
+            console.error(`Error fetching blog posts, Error: ${err.stack}`);
+        }
     }
 
     _statusCheck(res) {

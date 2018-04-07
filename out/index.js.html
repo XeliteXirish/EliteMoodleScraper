@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Source: index.js | Elite Moodle Scraper</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/bootstrap.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-jsdoc.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/tui-doc.css">
+
+
+</head>
+<body>
+<nav class="lnb" id="lnb">
+    <div class="logo" style="">
+
+        <img src="img/toast-ui.png" width="100%" height="100%">
+
+    </div>
+    <div class="title">
+        <h1><a href="index.html" class="link">Elite Moodle Scraper</a></h1>
+
+    </div>
+    <div class="search-container" id="search-container">
+        <input type="text" placeholder="Search">
+        <ul></ul>
+    </div>
+
+    <div class="lnb-api hidden"><h3>Classes</h3>
+        <ul>
+            <li><a href="MoodleUser.html">MoodleUser</a>
+                <button type="button" class="hidden toggle-subnav btn btn-link"><span
+                        class="glyphicon glyphicon-plus"></span></button>
+                <div class="hidden" id="MoodleUser_sub">
+                    <div class="member-type">Members</div>
+                    <ul class="inner">
+                        <li><a href="MoodleUser.html#grades">grades</a></li>
+                        <li><a href="MoodleUser.html#info">info</a></li>
+                        <li><a href="MoodleUser.html#lastLogin">lastLogin</a></li>
+                        <li><a href="MoodleUser.html#modules">modules</a></li>
+                    </ul>
+                    <div class="member-type">Methods</div>
+                    <ul class="inner">
+                        <li><a href="MoodleUser.html#fetchGrades">fetchGrades</a></li>
+                        <li><a href="MoodleUser.html#fetchModules">fetchModules</a></li>
+                        <li><a href="MoodleUser.html#fetchUserInfo">fetchUserInfo</a></li>
+                        <li><a href="MoodleUser.html#login">login</a></li>
+                    </ul>
+                </div>
+            </li>
+        </ul>
+    </div>
+</nav>
+<div id="resizer"></div>
+
+<div class="main" id="main">
+
+
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const axios = require('axios');
+let request = require('request-promise').defaults({jar: true});
+const cheerio = require('cheerio');
+
+/**
+ * Moodle user
+ */
+class MoodleUser {
+
+    /**
+     * Create a new moodle user object
+     * @param {String} username - The users moodle username
+     * @param {String} password - The users moodle password
+     * @param {String} moodleURL - The moodle websites address
+     */
+    constructor(username = '', password = '', moodleURL = '') {
+        this.username = username;
+        this.password = password;
+        this.moodleURL = (moodleURL.endsWith('/') ? moodleURL.slice(0, -1) : `${moodleURL}`);
+        this.loggedIn = false;
+    }
+
+    /**
+     * Will attempt log the account in
+     * @return {Promise&lt;Boolean>}
+     */
+    async login() {
+        try {
+            let res = await request.post({url: `${this.moodleURL}/login/index.php`, followAllRedirects: true, form: {username: this.username, password: this.password}, resolveWithFullResponse: true});
+            this.cookie = res.request.headers.cookie;
+            this.loggedIn = true;
+
+            this.login = Date.now();
+
+            return this.loggedIn;
+
+        }catch (err) {
+            console.error(`Error logging in, Error: ${err}`)
+        }
+    }
+
+    /**
+     * Fetches the users information and stores it in the cache
+     * @return {Promise&lt;Object>}
+     */
+    async fetchUserInfo() {
+        if (!this.loggedIn) return console.error(`Not logged in yet!`);
+        let res = await axios.get(`${this.moodleURL}/user/profile.php`, {headers: {Cookie: this.cookie}});
+        this._statusCheck(res);
+
+        const $ = cheerio.load(res.data);
+        this.userInfo = {
+            'name': $('.usertext').text(),
+            'avatar': $('.userpicture').first().attr('src')
+        };
+
+        return this.userInfo;
+    }
+
+    /**
+     * Fetches the users course modules and stores it in the cache
+     * @return {Promise&lt;Object>}
+     */
+    async fetchModules() {
+        if (!this.loggedIn) return console.error(`Not logged in yet!`);
+
+        let res = await axios.get(`${this.moodleURL}/user/profile.php`, {headers: {Cookie: this.cookie}});
+        this._statusCheck(res);
+
+        const $ = cheerio.load(res.data);
+        this.userModules = $('.contentnode').children().first().children().last().children().first().children().map((i, elem) => $(elem).text()).get() || [];
+        return this.userModules;
+    }
+
+    /**
+     * Fetches the users module grades and stores it in the cache
+     * @return {Promise&lt;Object>}
+     */
+    async fetchGrades() {
+        if (!this.loggedIn) return console.error(`Not logged in yet!`);
+
+        let res = await axios.get(`${this.moodleURL}/grade/report/overview/index.php`, {headers: {Cookie: this.cookie}});
+        this._statusCheck(res);
+
+        const $ = cheerio.load(res.data);
+        this.moduleGrades = $('#overview-grade').children().last().children().not('.emptyrow').map((i, elem) => {
+            return {name: $(elem).children().first().text(), value: $(elem).children().last().text()}
+        }).get();
+
+        return this.moduleGrades;
+    }
+
+    /**
+     * Returns the last login time
+     * @return {*}
+     */
+    get lastLogin() {
+        return this.login ? Date.now() - this.login : null;
+    }
+
+    /**
+     * Returns the cached user grades
+     * @return {jQuery|*}
+     */
+    get grades() {
+        return this.moduleGrades;
+    }
+
+    /**
+     * Returns the cached user modules
+     * @return {jQuery|Array|*}
+     */
+    get modules() {
+        return this.userModules;
+    }
+
+    /**
+     * Returns the user info
+     * @return {{name: jQuery, avatar: *|jQuery}|*}
+     */
+    get info() {
+        return this.userInfo
+    }
+
+    _statusCheck(res) {
+        if (!(res.status >= 200 &amp;&amp; res.status &lt; 300)) return console.error(`Unable to fetch user data, Error: ${res.statusText}`);
+    }
+}
+
+module.exports = {
+    MoodleUser: MoodleUser
+};</code></pre>
+        </article>
+    </section>
+
+
+</div>
+
+<footer>
+    <img class="logo" src="img/toast-ui.png" style="">
+    <div class="footer-text">My awesome footer text</div>
+</footer>
+<script>prettyPrint();</script>
+<script src="scripts/jquery.min.js"></script>
+<script src="scripts/tui-doc.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+<script>
+    var id = '_sub'.replace(/"/g, '_');
+    var selectedApi = document.getElementById(id); // do not use jquery selector
+    var $selectedApi = $(selectedApi);
+
+    $selectedApi.removeClass('hidden');
+    $selectedApi.parent().find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-minus');
+    showLnbApi();
+</script>
+
+</body>
+</html>
