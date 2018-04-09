@@ -26,6 +26,8 @@
     <div class="title">
         <h1><a href="index.html" class="link">Elite Moodle Scraper</a></h1>
 
+        <span class="version">v1.0.0</span>
+
     </div>
     <div class="search-container" id="search-container">
         <input type="text" placeholder="Search">
@@ -47,6 +49,7 @@
                     </ul>
                     <div class="member-type">Methods</div>
                     <ul class="inner">
+                        <li><a href="MoodleUser.html#fetchBlogPosts">fetchBlogPosts</a></li>
                         <li><a href="MoodleUser.html#fetchGrades">fetchGrades</a></li>
                         <li><a href="MoodleUser.html#fetchModules">fetchModules</a></li>
                         <li><a href="MoodleUser.html#fetchUserInfo">fetchUserInfo</a></li>
@@ -69,91 +72,27 @@ let request = require('request-promise').defaults({jar: true});
 const cheerio = require('cheerio');
 
 /**
- * Moodle user
+ * A new moodle user object which is used to fetch info for a specific person.  Can be linked to different moodle websites.
  */
 class MoodleUser {
 
     /**
-     * Create a new moodle user object
+     * Create a new moodle user object (Can be passed in as env variables USERNAME, PASSWORD and MOODLEURL)
      * @param {String} username - The users moodle username
      * @param {String} password - The users moodle password
      * @param {String} moodleURL - The moodle websites address
      */
     constructor(username = '', password = '', moodleURL = '') {
+        if (process.env.USERNAME &amp;&amp; process.env.PASSWORD &amp;&amp; process.env.MOODLEURL){
+            username = process.env.USERNAME;
+            password = process.env.PASSWORD;
+            moodleURL = process.env.MOODLEURL;
+        }
+
         this.username = username;
         this.password = password;
         this.moodleURL = (moodleURL.endsWith('/') ? moodleURL.slice(0, -1) : `${moodleURL}`);
         this.loggedIn = false;
-    }
-
-    /**
-     * Will attempt log the account in
-     * @return {Promise&lt;Boolean>}
-     */
-    async login() {
-        try {
-            let res = await request.post({url: `${this.moodleURL}/login/index.php`, followAllRedirects: true, form: {username: this.username, password: this.password}, resolveWithFullResponse: true});
-            this.cookie = res.request.headers.cookie;
-            this.loggedIn = true;
-
-            this.login = Date.now();
-
-            return this.loggedIn;
-
-        }catch (err) {
-            console.error(`Error logging in, Error: ${err}`)
-        }
-    }
-
-    /**
-     * Fetches the users information and stores it in the cache
-     * @return {Promise&lt;Object>}
-     */
-    async fetchUserInfo() {
-        if (!this.loggedIn) return console.error(`Not logged in yet!`);
-        let res = await axios.get(`${this.moodleURL}/user/profile.php`, {headers: {Cookie: this.cookie}});
-        this._statusCheck(res);
-
-        const $ = cheerio.load(res.data);
-        this.userInfo = {
-            'name': $('.usertext').text(),
-            'avatar': $('.userpicture').first().attr('src')
-        };
-
-        return this.userInfo;
-    }
-
-    /**
-     * Fetches the users course modules and stores it in the cache
-     * @return {Promise&lt;Object>}
-     */
-    async fetchModules() {
-        if (!this.loggedIn) return console.error(`Not logged in yet!`);
-
-        let res = await axios.get(`${this.moodleURL}/user/profile.php`, {headers: {Cookie: this.cookie}});
-        this._statusCheck(res);
-
-        const $ = cheerio.load(res.data);
-        this.userModules = $('.contentnode').children().first().children().last().children().first().children().map((i, elem) => $(elem).text()).get() || [];
-        return this.userModules;
-    }
-
-    /**
-     * Fetches the users module grades and stores it in the cache
-     * @return {Promise&lt;Object>}
-     */
-    async fetchGrades() {
-        if (!this.loggedIn) return console.error(`Not logged in yet!`);
-
-        let res = await axios.get(`${this.moodleURL}/grade/report/overview/index.php`, {headers: {Cookie: this.cookie}});
-        this._statusCheck(res);
-
-        const $ = cheerio.load(res.data);
-        this.moduleGrades = $('#overview-grade').children().last().children().not('.emptyrow').map((i, elem) => {
-            return {name: $(elem).children().first().text(), value: $(elem).children().last().text()}
-        }).get();
-
-        return this.moduleGrades;
     }
 
     /**
@@ -186,6 +125,112 @@ class MoodleUser {
      */
     get info() {
         return this.userInfo
+    }
+
+    /**
+     * Will attempt log the account in
+     * @async
+     * @return {Promise&lt;Boolean>}
+     */
+    async login() {
+        try {
+            let res = await request.post({url: `${this.moodleURL}/login/index.php`, followAllRedirects: true, form: {username: this.username, password: this.password}, resolveWithFullResponse: true});
+            this.cookie = res.request.headers.cookie;
+            this.loggedIn = true;
+
+            this.login = Date.now();
+
+            return this.loggedIn;
+
+        }catch (err) {
+            console.error(`Error logging in, Error: ${err.stack}`)
+        }
+    }
+
+    /**
+     * Fetches the users information and stores it in the cache
+     * @async
+     * @return {Promise&lt;Object>}
+     */
+    async fetchUserInfo() {
+        try {
+            if (!this.loggedIn) return console.error(`Not logged in yet!`);
+            let res = await axios.get(`${this.moodleURL}/user/profile.php`, {headers: {Cookie: this.cookie}});
+            this._statusCheck(res);
+
+            const $ = cheerio.load(res.data);
+            this.userInfo = {
+                'name': $('.usertext').text(),
+                'avatar': $('.userpicture').first().attr('src')
+            };
+
+            return this.userInfo;
+        } catch (err) {
+            console.error(`Error fetching user info, Error: ${err.stack}`);
+        }
+    }
+
+    /**
+     * Fetches the users course modules and stores it in the cache
+     * @async
+     * @return {Promise&lt;Object>}
+     */
+    async fetchModules() {
+        try {
+            if (!this.loggedIn) return console.error(`Not logged in yet!`);
+
+            let res = await axios.get(`${this.moodleURL}/user/profile.php`, {headers: {Cookie: this.cookie}});
+            this._statusCheck(res);
+
+            const $ = cheerio.load(res.data);
+            this.userModules = $('.contentnode').children().first().children().last().children().first().children().map((i, elem) => $(elem).text()).get() || [];
+            return this.userModules;
+        } catch (err) {
+            console.error(`Error fetching user modules, Error: ${err.stack}`);
+        }
+    }
+
+    /**
+     * Fetches the users module grades and stores it in the cache
+     * @async
+     * @return {Promise&lt;Object>}
+     */
+    async fetchGrades() {
+        try {
+            if (!this.loggedIn) return console.error(`Not logged in yet!`);
+
+            let res = await axios.get(`${this.moodleURL}/grade/report/overview/index.php`, {headers: {Cookie: this.cookie}});
+            this._statusCheck(res);
+
+            const $ = cheerio.load(res.data);
+            this.moduleGrades = $('#overview-grade').children().last().children().not('.emptyrow').map((i, elem) => {
+                return {name: $(elem).children().first().text(), value: $(elem).children().last().text()}
+            }).get();
+
+            return this.moduleGrades;
+        } catch (err) {
+            console.error(`Error fetching user grades, Error: ${err.stack}`);
+        }
+    }
+
+    /**
+     * Fetches the users blog posts and stores them in the cache
+     * @async
+     * @return {Promise&lt;void>}
+     */
+    async fetchBlogPosts() {
+        try {
+            if (!this.loggedIn) return console.error(`Not logged in yet!`);
+
+            let res = await axios.get(`${this.moodleURL}/blog/index.php`, {headers: {Cookie: this.cookie}});
+            this._statusCheck(res);
+
+            const $ = cheerio.load(res.data);
+
+
+        } catch (err) {
+            console.error(`Error fetching blog posts, Error: ${err.stack}`);
+        }
     }
 
     _statusCheck(res) {

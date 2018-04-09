@@ -3,12 +3,12 @@ let request = require('request-promise').defaults({jar: true});
 const cheerio = require('cheerio');
 
 /**
- * Moodle user
+ * A new moodle user object which is used to fetch info for a specific person.  Can be linked to different moodle websites.
  */
 class MoodleUser {
 
     /**
-     * Create a new moodle user object
+     * Create a new moodle user object (Can be passed in as env variables USERNAME, PASSWORD and MOODLEURL)
      * @param {String} username - The users moodle username
      * @param {String} password - The users moodle password
      * @param {String} moodleURL - The moodle websites address
@@ -60,6 +60,7 @@ class MoodleUser {
 
     /**
      * Will attempt log the account in
+     * @async
      * @return {Promise<Boolean>}
      */
     async login() {
@@ -79,6 +80,7 @@ class MoodleUser {
 
     /**
      * Fetches the users information and stores it in the cache
+     * @async
      * @return {Promise<Object>}
      */
     async fetchUserInfo() {
@@ -101,6 +103,7 @@ class MoodleUser {
 
     /**
      * Fetches the users course modules and stores it in the cache
+     * @async
      * @return {Promise<Object>}
      */
     async fetchModules() {
@@ -120,6 +123,7 @@ class MoodleUser {
 
     /**
      * Fetches the users module grades and stores it in the cache
+     * @async
      * @return {Promise<Object>}
      */
     async fetchGrades() {
@@ -140,6 +144,11 @@ class MoodleUser {
         }
     }
 
+    /**
+     * Fetches the users blog posts and stores them in the cache
+     * @async
+     * @return {Promise<void>}
+     */
     async fetchBlogPosts() {
         try {
             if (!this.loggedIn) return console.error(`Not logged in yet!`);
