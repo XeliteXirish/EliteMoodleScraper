@@ -14,6 +14,12 @@ class MoodleUser {
      * @param {String} moodleURL - The moodle websites address
      */
     constructor(username = '', password = '', moodleURL = '') {
+        if (process.env.USERNAME && process.env.PASSWORD && process.env.MOODLEURL){
+            username = process.env.USERNAME;
+            password = process.env.PASSWORD;
+            moodleURL = process.env.MOODLEURL;
+        }
+
         this.username = username;
         this.password = password;
         this.moodleURL = (moodleURL.endsWith('/') ? moodleURL.slice(0, -1) : `${moodleURL}`);
