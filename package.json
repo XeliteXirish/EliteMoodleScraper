@@ -4,7 +4,8 @@
   "description": "A modern and simple to use object orientated moodle scraper",
   "main": "./src/index.js",
   "scripts": {
-    "docs": "jsdoc ./src/index.js -c ./jsdoc.json -p ./package.json -d ./docs"
+    "docs": "jsdoc ./src/index.js -c ./jsdoc.json -p ./package.json -d ./docs",
+    "test": "jest"
   },
   "keywords": [
     "moodle",
@@ -24,6 +25,7 @@
   },
   "devDependencies": {
     "express": "^4.16.3",
+    "jest": "^22.4.3",
     "jsdoc": "^3.5.5",
     "tui-jsdoc-template": "^1.2.2"
   }

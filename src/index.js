@@ -8,17 +8,12 @@ const cheerio = require('cheerio');
 class MoodleUser {
 
     /**
-     * Create a new moodle user object (Can be passed in as env variables USERNAME, PASSWORD and MOODLEURL)
+     * Create a new moodle user object
      * @param {String} username - The users moodle username
      * @param {String} password - The users moodle password
      * @param {String} moodleURL - The moodle websites address
      */
     constructor(username = '', password = '', moodleURL = '') {
-        if (process.env.USERNAME && process.env.PASSWORD && process.env.MOODLEURL){
-            username = process.env.USERNAME;
-            password = process.env.PASSWORD;
-            moodleURL = process.env.MOODLEURL;
-        }
 
         this.username = username;
         this.password = password;

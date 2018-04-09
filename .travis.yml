@@ -1,0 +1,12 @@
+language: node_js
+node_js: "jest"
+sudo: required
+cache:
+   directories:
+     - node_modules
+before_install:
+  - npm install -g node-gyp
+before_script:
+  - npm install
+notifications:
+  email: false
