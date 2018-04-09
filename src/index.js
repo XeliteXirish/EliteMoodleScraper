@@ -152,6 +152,11 @@ class MoodleUser {
             this._statusCheck(res);
 
             const $ = cheerio.load(res.data);
+            const blogPosts = $('.blog_entry').map((i, elem) => {
+                return {
+                    author: ''//TODO
+                }
+            }).get();
 
 
         } catch (err) {
