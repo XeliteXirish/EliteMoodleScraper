@@ -5,6 +5,7 @@
   },
   "templates": {
     "name": "Elite Moodle Scraper",
-    "footerText": "My awesome footer text"
+    "footerText": "My awesome footer text",
+    "useCollapsibles": false
   }
 }

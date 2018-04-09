@@ -1,6 +1,16 @@
-# EliteMoodleScraper
-A modern and simple to use object orientated moodle scraper
-[![Build Status](https://travis-ci.com/XeliteXirish/EliteMoodleScraper.svg?token=5pJCf8csqaNRFsJJAzsK&branch=master)](https://travis-ci.com/XeliteXirish/EliteMoodleScraper)
+<h1 align="center">Elite Moodle Scraper</h1>
+<h5 align="center">A modern and simple to use object orientated moodle scraper</h5>
+<div align="center">
+    <a href="https://travis-ci.com/XeliteXirish/EliteMoodleScraper">
+        <img src="https://travis-ci.com/XeliteXirish/EliteMoodleScraper.svg?token=5pJCf8csqaNRFsJJAzsK&branch=master" alt="Build Status"/>
+    </a>
+</div>
+<br/>
+
+## Installation
+```javascript
+npm install --save elite-moodle-scraper
+```
 
 ### Usage
 ```javascript

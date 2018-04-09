@@ -15,6 +15,9 @@
     <link type="text/css" rel="stylesheet" href="styles/tui-doc.css">
 
 
+    <link type="text/css" rel="stylesheet" href="./docs.css">
+
+
 </head>
 <body>
 <nav class="lnb" id="lnb">
@@ -37,8 +40,6 @@
     <div class="lnb-api hidden"><h3>Classes</h3>
         <ul>
             <li><a href="MoodleUser.html">MoodleUser</a>
-                <button type="button" class="hidden toggle-subnav btn btn-link"><span
-                        class="glyphicon glyphicon-plus"></span></button>
                 <div class="hidden" id="MoodleUser_sub">
                     <div class="member-type">Members</div>
                     <ul class="inner">
@@ -126,6 +127,10 @@ class MoodleUser {
         return this.userInfo
     }
 
+    static _statusCheck(res) {
+        if (!(res.status >= 200 &amp;&amp; res.status &lt; 300)) return console.error(`Unable to fetch user data, ${chalk.red(`Status Code: ${res.statusText}`)}`);
+    }
+
     /**
      * Will attempt log the account in.  Recalling this method will refresh the auth token.
      * @async
@@ -169,7 +174,7 @@ class MoodleUser {
             this.loggedIn = false;
             return this.loggedIn;
 
-        }catch (err) {
+        } catch (err) {
             console.error(`Unable to log user ${chalk.green(this.username)} out! Error: ${chalk.red(err.name)}`);
         }
     }
@@ -266,18 +271,14 @@ class MoodleUser {
         }
     }
 
-    static _statusCheck(res) {
-        if (!(res.status >= 200 &amp;&amp; res.status &lt; 300)) return console.error(`Unable to fetch user data, ${chalk.red(`Status Code: ${res.statusText}`)}`);
-    }
-
     async _checkLogin() {
         try {
-            if (!this.loggedIn){
+            if (!this.loggedIn) {
                 return console.log(`Unable to login user ${chalk.red(this.username)} for website ${chalk.red(this.moodleURL)}\n${chalk.green(`Make sure you've called {MoodleUser}.login() first!`)}`);
 
             }
 
-        }catch (err) {
+        } catch (err) {
             console.error(`Error handling re-login attempts, Error: ${err.stack}`);
         }
     }

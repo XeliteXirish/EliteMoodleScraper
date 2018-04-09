@@ -15,6 +15,9 @@
     <link type="text/css" rel="stylesheet" href="styles/tui-doc.css">
 
 
+    <link type="text/css" rel="stylesheet" href="./docs.css">
+
+
 </head>
 <body>
 <nav class="lnb" id="lnb">
@@ -37,8 +40,6 @@
     <div class="lnb-api hidden"><h3>Classes</h3>
         <ul>
             <li><a href="MoodleUser.html">MoodleUser</a>
-                <button type="button" class="hidden toggle-subnav btn btn-link"><span
-                        class="glyphicon glyphicon-plus"></span></button>
                 <div class="hidden" id="MoodleUser_sub">
                     <div class="member-type">Members</div>
                     <ul class="inner">
@@ -64,6 +65,31 @@
 <div id="resizer"></div>
 
 <div class="main" id="main">
+
+
+    <section>
+        <article class="readme"><h1>EliteMoodleScraper</h1>
+            <p>A modern and simple to use object orientated moodle scraper
+                <a href="https://travis-ci.com/XeliteXirish/EliteMoodleScraper"><img
+                        src="https://travis-ci.com/XeliteXirish/EliteMoodleScraper.svg?token=5pJCf8csqaNRFsJJAzsK&amp;branch=master"
+                        alt="Build Status"></a></p>
+            <h3>Usage</h3>
+            <pre class="prettyprint source lang-javascript"><code>const MoodleUser = require('elite-moodle-scraper').MoodleUser;
+
+const user = new MoodleUser('USERNAME', 'SUPER_SECRET_PASSWORD', 'BASE_MOODLE_URL');
+user.login(async loggedIn => {
+    await user.fetchUserInfo();
+});</code></pre>
+            <h2>Contributing</h2>
+            <p>Before creating an issue, please ensure that the problem hasn't already been reported/suggested, and
+                double-check the
+                <a href="https://xelitexirish.github.io/EliteMoodleScraper/">documentation</a> to make sure it is
+                actually an issue!
+                If you wish to contribute to the codebase or docs, feel free to fork the repository, make what ever
+                changes
+                you want and then submit a pull request. Make sure to include a description of whatever you change!</p>
+        </article>
+    </section>
 
 
 </div>
