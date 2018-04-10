@@ -85,8 +85,10 @@
                 <li>Stores data in object cache.</li>
                 <li>After logging in, the login token is stored for future requests.</li>
             </ul>
+            <p><br/></p>
             <h2>Installation</h2>
             <pre class="prettyprint source lang-javascript"><code>npm install --save elite-moodle-scraper</code></pre>
+            <p><br/></p>
             <h3>Example</h3>
             <pre class="prettyprint source lang-javascript"><code>const MoodleUser = require('elite-moodle-scraper').MoodleUser;
 
@@ -94,6 +96,7 @@ const user = new MoodleUser('USERNAME', 'SUPER_SECRET_PASSWORD', 'BASE_MOODLE_UR
 user.login(async loggedIn => {
     await user.fetchUserInfo();
 });</code></pre>
+            <p><br/></p>
             <h2>Contributing</h2>
             <p>Before creating an issue, please ensure that the problem hasn't already been reported/suggested, and
                 double-check the
