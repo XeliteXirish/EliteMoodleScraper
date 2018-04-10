@@ -16,10 +16,14 @@
  - Stores data in object cache.
  - After logging in, the login token is stored for future requests.
 
+<br/>
+
 ## Installation
 ```javascript
 npm install --save elite-moodle-scraper
 ```
+
+<br/>
 
 ### Example
 ```javascript
@@ -30,6 +34,8 @@ user.login(async loggedIn => {
     await user.fetchUserInfo();
 });
 ```
+
+<br/>
 
 ## Contributing
 Before creating an issue, please ensure that the problem hasn't already been reported/suggested, and double-check the
