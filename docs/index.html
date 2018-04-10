@@ -26,7 +26,7 @@
     <div class="title">
         <h1><a href="index.html" class="link">Elite Moodle Scraper</a></h1>
 
-        <span class="version">v1.0.0</span>
+        <span class="version">v1.0.2</span>
 
     </div>
     <div class="search-container" id="search-container">
@@ -72,7 +72,8 @@
             <h1 align="center"><b>Elite Moodle Scraper</b></h1></p>
             <p><h5 align="center">A modern and simple to use object orientated moodle scraper</h5></p>
             <p>
-            <div align="center">
+                <div align="center">
+            <p>
                 <a href="https://travis-ci.com/XeliteXirish/EliteMoodleScraper">
                     <img src="https://travis-ci.com/XeliteXirish/EliteMoodleScraper.svg?token=5pJCf8csqaNRFsJJAzsK&branch=master"
                          alt="Build Status"/>
@@ -80,35 +81,55 @@
                 <a href="">
                     <img src="https://discordapp.com/api/guilds/433054430045143050/embed.png" alt="Discord Invite"/>
                 </a>
-            </div>
-            <br/></p>
-            <h2>Features</h2>
-            <ul>
-                <li>Easily scrape data from moodle accounts.</li>
-                <li>Stores data in object cache.</li>
-                <li>After logging in, the login token is stored for future requests.</li>
-            </ul>
-            <p><br/></p>
-            <h2>Installation</h2>
-            <pre class="prettyprint source lang-javascript"><code>npm install --save elite-moodle-scraper</code></pre>
-            <p><br/></p>
-            <h3>Example</h3>
-            <pre class="prettyprint source lang-javascript"><code>const MoodleUser = require('elite-moodle-scraper').MoodleUser;
+                <a href="https://discord.gg/Qq59KEV">
+                    <img src="https://img.shields.io/npm/v/elite-moodle-scraper.svg?maxAge=3600" alt="Version"/>
+                </a>
+                <a href="https://www.npmjs.com/package/elite-moodle-scraper">
+                    <img src="https://img.shields.io/npm/dt/elite-moodle-scraper.svg" alt="NPM Downloads"/>
+                </a>
+            </p>
+            <p>
+                <a href="https://nodei.co/npm/elite-moodle-scraper/"><img
+                        src="https://nodei.co/npm/elite-moodle-scraper.png?downloads=true&stars=true"
+                        alt="NPM Info"/></a>
+            </p>
+</div>
+<br/></p>
+<h2>Features</h2>
+<ul>
+    <li><p>Easily scrape data from multiple moodle accounts.</p>
+        <ul>
+            <li>Fetch user info</li>
+            <li>Fetch modules</li>
+            <li>Fetch grades</li>
+            <li>Fetch upcoming calender</li>
+            <li>Fetch blog posts</li>
+            <li>Fetch previous sessions</li>
+        </ul>
+    </li>
+    <li><p>Stores data in object cache.</p>
+    </li>
+    <li>After logging in, the login token is stored for future requests.</li>
+    <li>A fake user agent is used in order to help stay undetected.</li>
+    <li>Works with user accounts on different moodle websites at the same time!
+        <br/></li>
+</ul>
+<h2>Installation</h2>
+<pre class="prettyprint source lang-javascript"><code>npm install --save elite-moodle-scraper</code></pre>
+<p><br/></p>
+<h3>Example</h3>
+<pre class="prettyprint source lang-javascript"><code>const MoodleUser = require('elite-moodle-scraper').MoodleUser;
 
 const user = new MoodleUser('USERNAME', 'SUPER_SECRET_PASSWORD', 'BASE_MOODLE_URL');
 user.login(async loggedIn => {
     await user.fetchUserInfo();
 });</code></pre>
-            <p><br/></p>
-            <h2>Contributing</h2>
-            <p>Before creating an issue, please ensure that the problem hasn't already been reported/suggested, and
-                double-check the
-                <a href="https://xelitexirish.github.io/EliteMoodleScraper/">documentation</a> to make sure it is
-                actually an issue!
-                If you wish to contribute to the codebase or docs, feel free to fork the repository, make what ever
-                changes
-                you want and then submit a pull request. Make sure to include a description of whatever you change!</p>
-        </article>
+<p><br/></p>
+<h2>Contributing</h2>
+<p>Before creating an issue, please ensure that the problem hasn't already been reported/suggested, and double-check the
+    <a href="https://xelitexirish.github.io/EliteMoodleScraper/">documentation</a> to make sure it is actually an issue!
+    If you wish to contribute to the codebase or docs, feel free to fork the repository, make what ever changes
+    you want and then submit a pull request. Make sure to include a description of whatever you change!</p></article>
     </section>
 
 
@@ -124,7 +145,7 @@ user.login(async loggedIn => {
 <script src="scripts/linenumber.js"></script>
 
 <script>
-    var id = 'package:moodlescraper_sub'.replace(/"/g, '_');
+    var id = 'package:elite-moodle-scraper_sub'.replace(/"/g, '_');
     var selectedApi = document.getElementById(id); // do not use jquery selector
     var $selectedApi = $(selectedApi);
 
