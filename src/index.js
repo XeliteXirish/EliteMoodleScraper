@@ -203,7 +203,6 @@ class MoodleUser {
 
             const $ = cheerio.load(res.data);
             this.blogPosts = $('.blog_entry').map((i, elem) => {
-                console.log(`here`)
                 return {
                     subject: $(elem).children().first().children().last().children().first().text(),
                     author: $(elem).children().first().children().last().children().last().text(),
