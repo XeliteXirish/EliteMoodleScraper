@@ -3,7 +3,7 @@
 <div align="center">
     <p>
         <a href="https://travis-ci.com/XeliteXirish/EliteMoodleScraper">
-            <img src="https://travis-ci.com/XeliteXirish/EliteMoodleScraper.svg?token=5pJCf8csqaNRFsJJAzsK&branch=master" alt="Build Status"/>
+            <img src="https://travis-ci.org/XeliteXirish/EliteMoodleScraper.svg?branch=master" alt="Build Status"/>
         </a>
         <a href="">
             <img src="https://discordapp.com/api/guilds/433054430045143050/embed.png" alt="Discord Invite"/>
