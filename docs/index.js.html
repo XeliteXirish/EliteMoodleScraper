@@ -52,6 +52,7 @@
                         <li><a href="MoodleUser.html#fetchCalender">fetchCalender</a></li>
                         <li><a href="MoodleUser.html#fetchGrades">fetchGrades</a></li>
                         <li><a href="MoodleUser.html#fetchModules">fetchModules</a></li>
+                        <li><a href="MoodleUser.html#fetchSessions">fetchSessions</a></li>
                         <li><a href="MoodleUser.html#fetchUserInfo">fetchUserInfo</a></li>
                         <li><a href="MoodleUser.html#login">login</a></li>
                         <li><a href="MoodleUser.html#logout">logout</a></li>
@@ -273,12 +274,16 @@ class MoodleUser {
 
             const $ = cheerio.load(res.data);
             this.blogPosts = $('.blog_entry').map((i, elem) => {
+                console.log(`here`)
                 return {
-                    subject: $(elem).children().first().children()[1].children().first().text(),
-                    author: $(elem).children().first().children()[1].children().last().text(),
+                    subject: $(elem).children().first().children().last().children().first().text(),
+                    author: $(elem).children().first().children().last().children().last().text(),
+                    authorPicture: $(elem).children().first().children().first().children().first().children().first().attr('src'),
+                    text: $(elem).children().last().children().first().children().filter('.no-overflow').text()
                 }
             }).get();
 
+            return this.blogPosts;
 
         } catch (err) {
             return [];
@@ -308,6 +313,34 @@ class MoodleUser {
             }).get();
 
             return this.calender;
+        } catch (err) {
+            return [];
+        }
+    }
+
+    /**
+     * Fetches the users sessions and stores it in the cache
+     * @async
+     * @return {Promise&lt;Array(Object)>}
+     */
+    async fetchSessions() {
+        try {
+            await this._checkLogin();
+
+            let res = await axios.get(`${this.moodleURL}/report/usersessions/user.php`, {headers: {Cookie: this.cookie}});
+            MoodleUser._statusCheck(res);
+
+            const $ = cheerio.load(res.data);
+            this.sessions = $('.generaltable').children().last().children().map((i, elem) => {
+                return {
+                    date: $(elem).children().filter('.c0').text(),
+                    lastAccess: $(elem).children().filter('.c1').text(),
+                    ip: $(elem).children().filter('.c2').text()
+                }
+            }).get();
+
+            return this.sessions;
+
         } catch (err) {
             return [];
         }

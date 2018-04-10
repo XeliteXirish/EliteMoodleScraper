@@ -1,6 +1,6 @@
 {
-  "name": "moodlescraper",
-  "version": "1.0.0",
+  "name": "elite-moodle-scraper",
+  "version": "1.0.1",
   "description": "A modern and simple to use object orientated moodle scraper",
   "main": "./src/index.js",
   "scripts": {
@@ -15,6 +15,10 @@
     "type": "git",
     "url": "https://github.com/XeliteXirish/EliteMoodleScraper.git"
   },
+  "bugs": {
+    "url": "https://github.com/XeliteXirish/EliteMoodleScraper/issues"
+  },
+  "homepage": "https://xelitexirish.github.io/EliteMoodleScraper/",
   "author": "Shaun O'Neill (XeliteXirish)",
   "license": "ISC",
   "dependencies": {
