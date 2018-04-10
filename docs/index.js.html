@@ -44,6 +44,7 @@
                         <li><a href="MoodleUser.html#info">info</a></li>
                         <li><a href="MoodleUser.html#lastLogin">lastLogin</a></li>
                         <li><a href="MoodleUser.html#modules">modules</a></li>
+                        <li><a href="MoodleUser.html#status">status</a></li>
                     </ul>
                     <div class="member-type">Methods</div>
                     <ul class="inner">
@@ -90,6 +91,14 @@ class MoodleUser {
 
         this.loggedIn = false;
         this.loginReTrys = 0;
+    }
+
+    /**
+     * Returns the current users login status
+     * @return {Boolean} - If the user object is currently logged in.
+     */
+    get status() {
+        return this.loggedIn;
     }
 
     /**
@@ -169,6 +178,7 @@ class MoodleUser {
             MoodleUser._statusCheck(res);
 
             this.loggedIn = false;
+            this.cookie = '';
             return this.loggedIn;
 
         } catch (err) {

@@ -25,6 +25,14 @@ class MoodleUser {
     }
 
     /**
+     * Returns the current users login status
+     * @return {Boolean} - If the user object is currently logged in.
+     */
+    get status() {
+        return this.loggedIn;
+    }
+
+    /**
      * Returns the last login time
      * @return {Date} The time since the last login
      */
@@ -101,6 +109,7 @@ class MoodleUser {
             MoodleUser._statusCheck(res);
 
             this.loggedIn = false;
+            this.cookie = '';
             return this.loggedIn;
 
         } catch (err) {
