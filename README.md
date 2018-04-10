@@ -1,18 +1,27 @@
-<h1 align="center">Elite Moodle Scraper</h1>
+<h1 align="center"><b>Elite Moodle Scraper</b></h1>
 <h5 align="center">A modern and simple to use object orientated moodle scraper</h5>
 <div align="center">
     <a href="https://travis-ci.com/XeliteXirish/EliteMoodleScraper">
         <img src="https://travis-ci.com/XeliteXirish/EliteMoodleScraper.svg?token=5pJCf8csqaNRFsJJAzsK&branch=master" alt="Build Status"/>
     </a>
+    <a href="">
+        <img src="https://discordapp.com/api/guilds/433054430045143050/embed.png" alt="Discord Invite"/>
+    </a>
 </div>
 <br/>
+
+## Features
+
+ - Easily scrape data from moodle accounts.
+ - Stores data in object cache.
+ - After logging in, the login token is stored for future requests.
 
 ## Installation
 ```javascript
 npm install --save elite-moodle-scraper
 ```
 
-### Usage
+### Example
 ```javascript
 const MoodleUser = require('elite-moodle-scraper').MoodleUser;
 

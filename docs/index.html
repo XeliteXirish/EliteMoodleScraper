@@ -15,9 +15,6 @@
     <link type="text/css" rel="stylesheet" href="styles/tui-doc.css">
 
 
-    <link type="text/css" rel="stylesheet" href="./docs.css">
-
-
 </head>
 <body>
 <nav class="lnb" id="lnb">
@@ -68,12 +65,29 @@
 
 
     <section>
-        <article class="readme"><h1>EliteMoodleScraper</h1>
-            <p>A modern and simple to use object orientated moodle scraper
-                <a href="https://travis-ci.com/XeliteXirish/EliteMoodleScraper"><img
-                        src="https://travis-ci.com/XeliteXirish/EliteMoodleScraper.svg?token=5pJCf8csqaNRFsJJAzsK&amp;branch=master"
-                        alt="Build Status"></a></p>
-            <h3>Usage</h3>
+        <article class="readme"><p>
+            <h1 align="center"><b>Elite Moodle Scraper</b></h1></p>
+            <p><h5 align="center">A modern and simple to use object orientated moodle scraper</h5></p>
+            <p>
+            <div align="center">
+                <a href="https://travis-ci.com/XeliteXirish/EliteMoodleScraper">
+                    <img src="https://travis-ci.com/XeliteXirish/EliteMoodleScraper.svg?token=5pJCf8csqaNRFsJJAzsK&branch=master"
+                         alt="Build Status"/>
+                </a>
+                <a href="">
+                    <img src="https://discordapp.com/api/guilds/433054430045143050/embed.png" alt="Discord Invite"/>
+                </a>
+            </div>
+            <br/></p>
+            <h2>Features</h2>
+            <ul>
+                <li>Easily scrape data from moodle accounts.</li>
+                <li>Stores data in object cache.</li>
+                <li>After logging in, the login token is stored for future requests.</li>
+            </ul>
+            <h2>Installation</h2>
+            <pre class="prettyprint source lang-javascript"><code>npm install --save elite-moodle-scraper</code></pre>
+            <h3>Example</h3>
             <pre class="prettyprint source lang-javascript"><code>const MoodleUser = require('elite-moodle-scraper').MoodleUser;
 
 const user = new MoodleUser('USERNAME', 'SUPER_SECRET_PASSWORD', 'BASE_MOODLE_URL');
