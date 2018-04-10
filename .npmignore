@@ -13,6 +13,7 @@ logs/
 .tmp/
 .vscode/
 docs/
+.idea/
 
 # NPM ignore
 .eslintrc.json
