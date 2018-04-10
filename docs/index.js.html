@@ -49,6 +49,7 @@
                     <div class="member-type">Methods</div>
                     <ul class="inner">
                         <li><a href="MoodleUser.html#fetchBlogPosts">fetchBlogPosts</a></li>
+                        <li><a href="MoodleUser.html#fetchCalender">fetchCalender</a></li>
                         <li><a href="MoodleUser.html#fetchGrades">fetchGrades</a></li>
                         <li><a href="MoodleUser.html#fetchModules">fetchModules</a></li>
                         <li><a href="MoodleUser.html#fetchUserInfo">fetchUserInfo</a></li>
@@ -144,7 +145,12 @@ class MoodleUser {
      */
     async login() {
         try {
-            let res = await request.post({url: `${this.moodleURL}/login/index.php`, followAllRedirects: true, form: {username: this.username, password: this.password}, resolveWithFullResponse: true});
+            let res = await request.post({
+                url: `${this.moodleURL}/login/index.php`,
+                followAllRedirects: true,
+                form: {username: this.username, password: this.password},
+                resolveWithFullResponse: true
+            });
             this.cookie = res.request.headers.cookie; // Stupid website only returns a 200 status code for everything #SmartPeople
 
             this.loggedIn = !!(this.cookie); // If we can't get a login token we haven't logged in
@@ -157,7 +163,7 @@ class MoodleUser {
             this.login = Date.now();
             return this.loggedIn;
 
-        }catch (err) {
+        } catch (err) {
             // If the actual post fails
             this.loggedIn = false;
             this.loginReTrys++;
@@ -206,14 +212,14 @@ class MoodleUser {
 
             return this.userInfo;
         } catch (err) {
-            return [];
+            return {};
         }
     }
 
     /**
      * Fetches the users course modules and stores it in the cache
      * @async
-     * @return {Promise&lt;Object>}
+     * @return {Promise&lt;Array(Object)>}
      */
     async fetchModules() {
         try {
@@ -233,7 +239,7 @@ class MoodleUser {
     /**
      * Fetches the users module grades and stores it in the cache
      * @async
-     * @return {Promise&lt;Object>}
+     * @return {Promise&lt;Array(Object)>}
      */
     async fetchGrades() {
         try {
@@ -256,7 +262,7 @@ class MoodleUser {
     /**
      * Fetches the users blog posts and stores them in the cache
      * @async
-     * @return {Promise&lt;Array>}
+     * @return {Promise&lt;Array(Object)>}
      */
     async fetchBlogPosts() {
         try {
@@ -266,13 +272,42 @@ class MoodleUser {
             MoodleUser._statusCheck(res);
 
             const $ = cheerio.load(res.data);
-            const blogPosts = $('.blog_entry').map((i, elem) => {
+            this.blogPosts = $('.blog_entry').map((i, elem) => {
                 return {
-                    author: ''//TODO
+                    subject: $(elem).children().first().children()[1].children().first().text(),
+                    author: $(elem).children().first().children()[1].children().last().text(),
                 }
             }).get();
 
 
+        } catch (err) {
+            return [];
+        }
+    }
+
+    /**
+     * Fetches the users upcoming calender and stores it in the cache
+     * @async
+     * @return {Promise&lt;Array(Object)>}
+     */
+    async fetchCalender() {
+        try {
+            await this._checkLogin();
+
+            let res = await axios.get(`${this.moodleURL}/calendar/view.php`, {headers: {Cookie: this.cookie}});
+            MoodleUser._statusCheck(res);
+
+            const $ = cheerio.load(res.data);
+            this.calender = $('.eventlist').children().map((i, elem) => {
+                return {
+                    name: $(elem).children().filter('.referer').text(),
+                    course: $(elem).children().filter('.course').text(),
+                    date: $(elem).children().filter('.date').text(),
+                    description: $(elem).children().filter('.description').text()
+                };
+            }).get();
+
+            return this.calender;
         } catch (err) {
             return [];
         }

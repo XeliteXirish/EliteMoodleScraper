@@ -75,7 +75,12 @@ class MoodleUser {
      */
     async login() {
         try {
-            let res = await request.post({url: `${this.moodleURL}/login/index.php`, followAllRedirects: true, form: {username: this.username, password: this.password}, resolveWithFullResponse: true});
+            let res = await request.post({
+                url: `${this.moodleURL}/login/index.php`,
+                followAllRedirects: true,
+                form: {username: this.username, password: this.password},
+                resolveWithFullResponse: true
+            });
             this.cookie = res.request.headers.cookie; // Stupid website only returns a 200 status code for everything #SmartPeople
 
             this.loggedIn = !!(this.cookie); // If we can't get a login token we haven't logged in
@@ -88,7 +93,7 @@ class MoodleUser {
             this.login = Date.now();
             return this.loggedIn;
 
-        }catch (err) {
+        } catch (err) {
             // If the actual post fails
             this.loggedIn = false;
             this.loginReTrys++;
@@ -137,14 +142,14 @@ class MoodleUser {
 
             return this.userInfo;
         } catch (err) {
-            return [];
+            return {};
         }
     }
 
     /**
      * Fetches the users course modules and stores it in the cache
      * @async
-     * @return {Promise<Object>}
+     * @return {Promise<Array(Object)>}
      */
     async fetchModules() {
         try {
@@ -164,7 +169,7 @@ class MoodleUser {
     /**
      * Fetches the users module grades and stores it in the cache
      * @async
-     * @return {Promise<Object>}
+     * @return {Promise<Array(Object)>}
      */
     async fetchGrades() {
         try {
@@ -187,7 +192,7 @@ class MoodleUser {
     /**
      * Fetches the users blog posts and stores them in the cache
      * @async
-     * @return {Promise<Array>}
+     * @return {Promise<Array(Object)>}
      */
     async fetchBlogPosts() {
         try {
@@ -197,12 +202,73 @@ class MoodleUser {
             MoodleUser._statusCheck(res);
 
             const $ = cheerio.load(res.data);
-            const blogPosts = $('.blog_entry').map((i, elem) => {
+            this.blogPosts = $('.blog_entry').map((i, elem) => {
+                console.log(`here`)
                 return {
-                    author: ''//TODO
+                    subject: $(elem).children().first().children().last().children().first().text(),
+                    author: $(elem).children().first().children().last().children().last().text(),
+                    authorPicture: $(elem).children().first().children().first().children().first().children().first().attr('src'),
+                    text: $(elem).children().last().children().first().children().filter('.no-overflow').text()
                 }
             }).get();
 
+            return this.blogPosts;
+
+        } catch (err) {
+            return [];
+        }
+    }
+
+    /**
+     * Fetches the users upcoming calender and stores it in the cache
+     * @async
+     * @return {Promise<Array(Object)>}
+     */
+    async fetchCalender() {
+        try {
+            await this._checkLogin();
+
+            let res = await axios.get(`${this.moodleURL}/calendar/view.php`, {headers: {Cookie: this.cookie}});
+            MoodleUser._statusCheck(res);
+
+            const $ = cheerio.load(res.data);
+            this.calender = $('.eventlist').children().map((i, elem) => {
+                return {
+                    name: $(elem).children().filter('.referer').text(),
+                    course: $(elem).children().filter('.course').text(),
+                    date: $(elem).children().filter('.date').text(),
+                    description: $(elem).children().filter('.description').text()
+                };
+            }).get();
+
+            return this.calender;
+        } catch (err) {
+            return [];
+        }
+    }
+
+    /**
+     * Fetches the users sessions and stores it in the cache
+     * @async
+     * @return {Promise<Array(Object)>}
+     */
+    async fetchSessions() {
+        try {
+            await this._checkLogin();
+
+            let res = await axios.get(`${this.moodleURL}/report/usersessions/user.php`, {headers: {Cookie: this.cookie}});
+            MoodleUser._statusCheck(res);
+
+            const $ = cheerio.load(res.data);
+            this.sessions = $('.generaltable').children().last().children().map((i, elem) => {
+                return {
+                    date: $(elem).children().filter('.c0').text(),
+                    lastAccess: $(elem).children().filter('.c1').text(),
+                    ip: $(elem).children().filter('.c2').text()
+                }
+            }).get();
+
+            return this.sessions;
 
         } catch (err) {
             return [];
