@@ -26,7 +26,7 @@
     <div class="title">
         <h1><a href="index.html" class="link">Elite Moodle Scraper</a></h1>
 
-        <span class="version">v1.0.3</span>
+        <span class="version">v1.0.5</span>
 
     </div>
     <div class="search-container" id="search-container">
@@ -274,7 +274,6 @@ class MoodleUser {
 
             const $ = cheerio.load(res.data);
             this.blogPosts = $('.blog_entry').map((i, elem) => {
-                console.log(`here`)
                 return {
                     subject: $(elem).children().first().children().last().children().first().text(),
                     author: $(elem).children().first().children().last().children().last().text(),
