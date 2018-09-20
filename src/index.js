@@ -137,7 +137,7 @@ class MoodleUser {
             const $ = cheerio.load(res.data);
             this.userInfo = {
                 'name': $('.usertext').text(),
-                'avatar': $('.userpicture').first().attr('src')
+                'avatar': $('.contentnode').first().first().last().text()
             };
 
             return this.userInfo;
@@ -155,11 +155,12 @@ class MoodleUser {
         try {
             await this._checkLogin();
 
-            let res = await axios.get(`${this.moodleURL}/user/profile.php`, {headers: {Cookie: this.cookie}});
+            let res = await axios.get(`${this.moodleURL}/user/profile.php&showallcourses=1`, {headers: {Cookie: this.cookie}});
             MoodleUser._statusCheck(res);
 
             const $ = cheerio.load(res.data);
-            this.userModules = $('.contentnode').children().first().children().last().children().first().children().map((i, elem) => $(elem).text()).get() || [];
+            this.userModules = $('#yui_3_17_2_1_1537436266030_20').first().children().last().children().first().children().first().children().last().children().first().children().map((i, elem) => $(elem).text())
+
             return this.userModules;
         } catch (err) {
             return [];
@@ -240,7 +241,7 @@ class MoodleUser {
                 };
             }).get();
 
-            return this.calender;
+            return this.calender || [];
         } catch (err) {
             return [];
         }
