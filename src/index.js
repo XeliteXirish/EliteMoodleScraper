@@ -146,7 +146,6 @@ class MoodleUser {
             return this.userInfo;
         } catch (err) {
             throw new UnhandledMoodleError(`Unable to fetch user info!`, err);
-            return {};
         }
     }
 
@@ -155,21 +154,19 @@ class MoodleUser {
      * @async
      * @return {Promise<Array(Object)>}
      */
-    //$('.profile_tree').children().eq(3).children().last().children().last().children().last().children().first() TODO
     async fetchModules() {
         try {
             await this._checkLogin();
 
-            let res = await axios.get(`${this.moodleURL}/user/profile.php`, {headers: {Cookie: this.cookie}});
+            let res = await axios.get(`${this.moodleURL}/user/profile.php?showallcourses=1`, {headers: {Cookie: this.cookie}});
             MoodleUser._statusCheck(res);
 
             const $ = cheerio.load(res.data);
-            this.userModules = $('#yui_3_17_2_1_1537436266030_20').first().children().last().children().first().children().first().children().last().children().first().children().map((i, elem) => $(elem).text())
+            this.userModules = $('.profile_tree').children().eq(3).children().last().children().last().children().last().children().last().children().first().children().map((i, elem) => $(elem).text()).get();
 
             return this.userModules;
         } catch (err) {
             throw new UnhandledMoodleError(`Unable to fetch user modules!`, err);
-            return [];
         }
     }
 
@@ -193,7 +190,6 @@ class MoodleUser {
             return this.moduleGrades;
         } catch (err) {
             throw new UnhandledMoodleError(`Unable to fetch user grades!`, err);
-            return [];
         }
     }
 
@@ -223,7 +219,6 @@ class MoodleUser {
 
         } catch (err) {
             throw new UnhandledMoodleError(`Unable to fetch moodle blog posts!`, err);
-            return [];
         }
     }
 
@@ -252,7 +247,6 @@ class MoodleUser {
             return this.calender || [];
         } catch (err) {
             throw new UnhandledMoodleError(`Unable to fetch user calender!`, err);
-            return [];
         }
     }
 
@@ -280,7 +274,7 @@ class MoodleUser {
             return this.sessions;
 
         } catch (err) {
-            return [];
+            throw new UnhandledMoodleError(`Unable to fetch users sessions!`, err);
         }
     }
 
