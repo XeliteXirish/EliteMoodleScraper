@@ -16,14 +16,47 @@ test('Created the new moodle user object', () => {
 
 test('Logs the user in correctly', async () => {
 
-    const logsIn = await getUserLoggedIn();
-    expect(logsIn).toBeTruthy();
+    expect(await getUserLoggedIn()).toBeTruthy();
 });
 
-test('Test to make sure all modules are listed', async () => {
+test(`Fetch the user info`, async () => {
+    const user = await getUserLoggedIn();
+
+    expect(await user.fetchUserInfo()).toBeTruthy();
+
+});
+
+test('Fetch all the users modules', async () => {
 
     const user = await getUserLoggedIn();
-    const modules = await user.fetchModules();
 
-    expect(modules).toBeTruthy();
+    expect(await user.fetchModules()).toBeTruthy();
+});
+
+test('Fetch all the users grades', async () => {
+
+    const user = await getUserLoggedIn();
+
+    expect(await user.fetchGrades()).toBeTruthy();
+});
+
+test('Fetch all the moodle blog posts', async () => {
+
+    const user = await getUserLoggedIn();
+
+    expect(await user.fetchBlogPosts()).toBeTruthy();
+});
+
+test('Fetch the users calender', async () => {
+
+    const user = await getUserLoggedIn();
+
+    expect(await user.fetchCalender()).toBeTruthy();
+});
+
+test('Fetch the users sessions', async () => {
+
+    const user = await getUserLoggedIn();
+
+    expect(await user.fetchSessions()).toBeTruthy();
 });
