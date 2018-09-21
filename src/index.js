@@ -3,6 +3,8 @@ let request = require('request-promise').defaults({jar: true});
 const cheerio = require('cheerio');
 const chalk = require('chalk');
 
+const {UnhandledMoodleError} = require('./errors');
+
 /**
  * A new moodle user object which is used to fetch info for a specific person.  Can be linked to different moodle websites.
  */
@@ -119,6 +121,7 @@ class MoodleUser {
 
         } catch (err) {
             console.error(`Unable to log user ${chalk.green(this.username)} out! Error: ${chalk.red(err.name)}`);
+            throw new UnhandledMoodleError(`Unable to log user ${chalk.green(this.username)} out!`, err);
         }
     }
 
@@ -142,7 +145,7 @@ class MoodleUser {
 
             return this.userInfo;
         } catch (err) {
-            return {};
+            throw new UnhandledMoodleError(`Unable to fetch user info!`, err);
         }
     }
 
@@ -155,15 +158,15 @@ class MoodleUser {
         try {
             await this._checkLogin();
 
-            let res = await axios.get(`${this.moodleURL}/user/profile.php&showallcourses=1`, {headers: {Cookie: this.cookie}});
+            let res = await axios.get(`${this.moodleURL}/user/profile.php?showallcourses=1`, {headers: {Cookie: this.cookie}});
             MoodleUser._statusCheck(res);
 
             const $ = cheerio.load(res.data);
-            this.userModules = $('#yui_3_17_2_1_1537436266030_20').first().children().last().children().first().children().first().children().last().children().first().children().map((i, elem) => $(elem).text())
+            this.userModules = $('.profile_tree').children().eq(3).children().last().children().last().children().last().children().last().children().first().children().map((i, elem) => $(elem).text()).get();
 
             return this.userModules;
         } catch (err) {
-            return [];
+            throw new UnhandledMoodleError(`Unable to fetch user modules!`, err);
         }
     }
 
@@ -186,7 +189,7 @@ class MoodleUser {
 
             return this.moduleGrades;
         } catch (err) {
-            return [];
+            throw new UnhandledMoodleError(`Unable to fetch user grades!`, err);
         }
     }
 
@@ -215,7 +218,7 @@ class MoodleUser {
             return this.blogPosts;
 
         } catch (err) {
-            return [];
+            throw new UnhandledMoodleError(`Unable to fetch moodle blog posts!`, err);
         }
     }
 
@@ -243,7 +246,7 @@ class MoodleUser {
 
             return this.calender || [];
         } catch (err) {
-            return [];
+            throw new UnhandledMoodleError(`Unable to fetch user calender!`, err);
         }
     }
 
@@ -271,7 +274,7 @@ class MoodleUser {
             return this.sessions;
 
         } catch (err) {
-            return [];
+            throw new UnhandledMoodleError(`Unable to fetch users sessions!`, err);
         }
     }
 
@@ -279,11 +282,10 @@ class MoodleUser {
         try {
             if (!this.loggedIn) {
                 return console.log(`Unable to login user ${chalk.red(this.username)} for website ${chalk.red(this.moodleURL)}\n${chalk.green(`Make sure you've called {MoodleUser}.login() first!`)}`);
-
             }
-
         } catch (err) {
             console.error(`Error handling re-login attempts, Error: ${err.stack}`);
+            throw new UnhandledMoodleError(`Unable to check if a user is logged in!`, err);
         }
     }
 }

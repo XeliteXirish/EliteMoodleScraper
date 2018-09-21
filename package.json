@@ -5,7 +5,7 @@
   "main": "./src/index.js",
   "scripts": {
     "docs": "jsdoc ./src/index.js -c ./jsdoc.json -p ./package.json -d ./docs -r ./README.md",
-    "test": "jest"
+    "test": "jest --testEnvironment node "
   },
   "keywords": [
     "moodle",
